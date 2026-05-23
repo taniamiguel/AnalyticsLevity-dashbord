@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Levity Ads CRM Command Center — Agendamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070812;--card:rgba(12,14,28,.88);--surface:rgba(18,20,38,.82);--line:rgba(148,163,184,.16);
+  --text:#e5eefc;--muted:#8a98b3;--muted2:#5d6b86;--accent:#00c8f5;--purple:#8b5cf6;
+  --green:#22d3a5;--red:#fb7185;--yellow:#fbbf24;--blue:#38bdf8;--pink:#ec4899;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;padding:26px;
+  background:radial-gradient(circle at 10% 5%,rgba(0,200,245,.22),transparent 28%),
+  radial-gradient(circle at 85% 0%,rgba(139,92,246,.24),transparent 32%),
+  linear-gradient(135deg,#060711,#0a1020 55%,#070812);
+}
+.shell{max-width:1500px;margin:auto}
+header{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;margin-bottom:20px}
+.eyebrow{font-family:DM Mono,monospace;color:var(--accent);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase}
+h1{font-family:Syne,sans-serif;font-size:clamp(2.1rem,5vw,4.7rem);line-height:.92;letter-spacing:-.075em}
+h1 span{background:linear-gradient(135deg,var(--accent),var(--purple),var(--pink));-webkit-background-clip:text;color:transparent}
+.copy{color:var(--muted);max-width:780px;line-height:1.6;margin-top:10px}
+.panel,.card{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.35);backdrop-filter:blur(16px)}
+.account{min-width:320px}
+.small{font-family:DM Mono,monospace;color:var(--muted);font-size:.72rem;line-height:1.55}
+.grid-setup{display:grid;grid-template-columns:1.5fr .9fr .7fr .55fr .55fr auto;gap:12px;align-items:end}
+label{display:block;font-family:DM Mono,monospace;font-size:.68rem;color:var(--muted);margin-bottom:7px}
+input,select,button,textarea{font-family:inherit}
+.input,.select,textarea{
+ width:100%;background:rgba(0,0,0,.23);border:1px solid var(--line);color:var(--text);
+ border-radius:15px;padding:12px 13px;outline:none
+}
+textarea{min-height:88px;resize:vertical}
+.btn{border:0;border-radius:15px;padding:12px 16px;cursor:pointer;font-weight:900;color:#04131c;background:linear-gradient(135deg,var(--accent),#7dd3fc)}
+.btn2{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--line)}
+.status{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-family:DM Mono,monospace;font-size:.78rem}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--yellow);box-shadow:0 0 18px rgba(251,191,36,.6)}
+.dot.done{background:var(--green)}.dot.error{background:var(--red)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
+.nav button{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--muted);padding:10px 14px;border-radius:999px;cursor:pointer;font-weight:800}
+.nav button.active{color:var(--text);border-color:rgba(0,200,245,.55);background:rgba(0,200,245,.16)}
+.section{display:none}.section.active{display:block}
+.title{font-family:Syne,sans-serif;font-weight:900;font-size:1.25rem;letter-spacing:-.04em;margin:24px 0 12px}
+.note{color:var(--muted);font-size:.86rem;margin-top:-6px;margin-bottom:13px}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(145px,1fr));gap:13px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:17px;position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple))}
+.kpi .name{font-family:DM Mono,monospace;color:var(--muted);font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.kpi .value{font-family:Syne,sans-serif;font-weight:900;font-size:1.65rem;letter-spacing:-.06em}
+.kpi .sub{color:var(--muted);font-size:.74rem;margin-top:7px;line-height:1.45}
+.two{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.list{display:grid;gap:12px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px}
+.item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.name{font-weight:900}.meta{color:var(--muted);font-size:.78rem;line-height:1.5;margin-top:5px}
+.pills{display:grid;grid-template-columns:repeat(8,minmax(80px,1fr));gap:8px;margin-top:13px}
+.pill{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:9px}
+.pl{font-family:DM Mono,monospace;color:var(--muted2);font-size:.6rem;text-transform:uppercase;margin-bottom:4px}
+.pv{font-weight:900;font-size:.9rem}
+.badge{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-family:DM Mono,monospace;font-size:.7rem;color:var(--muted);white-space:nowrap}
+.good{color:var(--green);border-color:rgba(34,211,165,.5)}.warn{color:var(--yellow);border-color:rgba(251,191,36,.5)}.bad{color:var(--red);border-color:rgba(251,113,133,.5)}
+.filters{display:grid;grid-template-columns:1fr 170px 170px 150px;gap:10px;margin-bottom:12px}
+.alert{border-left:4px solid var(--yellow)}.alert.high{border-left-color:var(--red)}.alert.low{border-left-color:var(--green)}
+.crm-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:14px}
+.crm-form{display:grid;gap:10px}
+.crm-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.table-wrap{overflow:auto;border-radius:18px}
+.table{width:100%;min-width:1200px;border-collapse:collapse;overflow:hidden;border-radius:18px}
+th,td{border-bottom:1px solid var(--line);padding:11px;text-align:left;font-size:.82rem;vertical-align:top}
+th{color:var(--muted);font-family:DM Mono,monospace;text-transform:uppercase;font-size:.64rem;letter-spacing:.1em}
+td select{padding:7px;border-radius:10px;background:#0b1020;color:var(--text);border:1px solid var(--line)}
+td .input{min-width:120px;padding:9px}
+.empty{padding:26px;border:1px solid var(--line);border-radius:20px;color:var(--muted);background:rgba(0,0,0,.18);line-height:1.6}
+.error{padding:14px;border:1px solid rgba(251,113,133,.35);border-radius:18px;color:#fecdd3;background:rgba(251,113,133,.08);margin:12px 0}
+.footer{color:var(--muted2);font-size:.73rem;line-height:1.5;margin-top:10px}
+.sheets-grid{display:grid;grid-template-columns:1.4fr repeat(5,auto);gap:10px;align-items:end;margin-top:14px}
+.sheets-status{margin-top:10px;color:var(--muted);font-family:DM Mono,monospace;font-size:.76rem;line-height:1.45}
+.smart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.smart-card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;position:relative;overflow:hidden}
+.smart-card.priority{border-color:rgba(251,191,36,.38);background:linear-gradient(180deg,rgba(251,191,36,.10),rgba(12,14,28,.88))}
+.smart-card.good-priority{border-color:rgba(34,211,165,.38);background:linear-gradient(180deg,rgba(34,211,165,.09),rgba(12,14,28,.88))}
+.smart-title{font-weight:900;margin-bottom:8px;letter-spacing:-.02em}
+.smart-text{color:var(--muted);font-size:.84rem;line-height:1.6}
+.radar-grid{display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:center}
+.score-ring{width:168px;height:168px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) calc(var(--score,0)*1%),rgba(255,255,255,.08) 0),radial-gradient(circle,#0b1022 62%,transparent 63%);box-shadow:inset 0 0 40px rgba(0,0,0,.45)}
+.score-inner{width:130px;height:130px;background:rgba(6,8,18,.94);border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;text-align:center}
+.score-number{font-family:Syne,sans-serif;font-weight:900;font-size:2.35rem;letter-spacing:-.08em}
+.score-label{color:var(--muted);font-size:.72rem;margin-top:-8px}
+.funnel-grid{display:grid;gap:10px}
+.funnel-row{display:grid;grid-template-columns:120px 1fr auto;align-items:center;gap:12px}
+.funnel-label{color:var(--muted);font-size:.78rem}
+.bar{height:12px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+.bar span{display:block;height:100%;border-radius:999px;width:var(--w,0%);background:linear-gradient(90deg,var(--accent),var(--purple))}
+.funnel-value{font-family:DM Mono,monospace;font-size:.78rem;color:var(--text)}
+.action-tag{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-family:DM Mono,monospace;font-size:.64rem;color:var(--muted);margin-bottom:10px}
+
+
+@media(max-width:1100px){.kpis,.three{grid-template-columns:repeat(2,1fr)}.two,.crm-grid{grid-template-columns:1fr}.pills{grid-template-columns:repeat(4,1fr)}.grid-setup,.filters,.sheets-grid{grid-template-columns:1fr}}
+@media(max-width:720px){body{padding:16px}header{grid-template-columns:1fr}.kpis,.three{grid-template-columns:1fr}.pills{grid-template-columns:repeat(2,1fr)}.crm-extra-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+ <div>
+  <div class="eyebrow">Levity Analytics · Ads + Alertas + CRM</div>
+  <h1>Command <span>Center</span></h1>
+  <p class="copy">Painel para analisar Meta Ads, gerar alertas inteligentes e controlar leads, agendamentos, valores e profissionais. Esta versão salva localmente e envia para Google Sheets.</p>
+ </div>
+ <aside class="panel account">
+  <div class="small">Conta monitorada</div>
+  <div class="name" id="acc-name">PodoSaude Podologia</div>
+  <div class="small">ID: <span id="acc-label">1339519327381059</span><br>Modo: local + Meta API</div>
+ </aside>
+</header>
+
+<section class="panel">
+ <div class="grid-setup">
+  <div><label>Token Meta</label><input id="token" class="input" type="password" placeholder="Cole seu token aqui"></div>
+  <div><label>ID conta anúncios</label><input id="account" class="input" value="1339519327381059"></div>
+  <div><label>Período</label><select id="preset" class="select" onchange="toggleCustomDates()"><option value="today">Hoje</option><option value="yesterday">Ontem</option><option value="last_7d">Últimos 7 dias</option><option value="last_14d">Últimos 14 dias</option><option value="last_30d" selected>Últimos 30 dias</option><option value="this_month">Este mês</option><option value="last_month">Mês passado</option><option value="custom">Personalizado</option></select></div>
+  <div id="custom-dates-box" style="display:none"><label>Início</label><input id="date-start" class="input" type="date"></div>
+  <div id="custom-dates-box-end" style="display:none"><label>Fim</label><input id="date-end" class="input" type="date"></div>
+  <button class="btn" onclick="fetchData()">Analisar agora</button>
+ </div>
+ <div class="status"><span class="dot" id="dot"></span><span id="status">Cole o token e rode a análise.</span></div>
+ <div class="footer">O token é salvo apenas neste navegador via localStorage. Para produção com clientes, use backend seguro.</div>
+
+ <div class="title" style="margin-top:18px;margin-bottom:8px">Google Sheets + Apps Script</div>
+ <p class="note">Cole aqui a URL do Web App do Apps Script para transformar sua planilha em banco de dados gratuito.</p>
+ <div class="sheets-grid">
+  <div><label>URL do Apps Script</label><input id="apps-script-url" class="input" placeholder="https://script.google.com/macros/s/.../exec"></div>
+  <button class="btn btn2" onclick="saveScriptUrl()">Salvar URL</button>
+  <button class="btn btn2" onclick="syncLeadsToSheets()">Enviar CRM</button>
+  <button class="btn btn2" onclick="syncAlertsToSheets()">Enviar alertas</button>
+  <button class="btn btn2" onclick="syncCampaignsToSheets()">Enviar campanhas</button>
+  <button class="btn" onclick="syncAllToSheets()">Enviar tudo</button>
+ </div>
+ <div class="sheets-status" id="sheets-status">Aguardando URL do Apps Script.</div>
+</section>
+<div id="error"></div>
+
+<div class="nav">
+ <button class="active" onclick="showTab('dashboard',this)">Dashboard</button>
+ <button onclick="showTab('alerts',this)">Alertas</button>
+ <button onclick="showTab('crm',this)">CRM</button>
+ <button onclick="showTab('campaigns',this)">Campanhas</button>
+ <button onclick="showTab('strategy',this)">Estratégia</button>
+</div>
+
+<section id="dashboard" class="section active">
+ <div class="title">Painel executivo</div>
+ <div class="kpis">
+  <div class="kpi"><div class="name">Investimento</div><div class="value" id="k-spend">—</div><div class="sub">Gasto total</div></div>
+  <div class="kpi"><div class="name">Cliques</div><div class="value" id="k-clicks">—</div><div class="sub">Cliques no link/anúncio</div></div>
+  <div class="kpi"><div class="name">CTR</div><div class="value" id="k-ctr">—</div><div class="sub">Atratividade</div></div>
+  <div class="kpi"><div class="name">Conversas</div><div class="value" id="k-msg">—</div><div class="sub">Inícios detectados</div></div>
+  <div class="kpi"><div class="name">Receita CRM</div><div class="value" id="k-revenue">—</div><div class="sub">Todos valores no CRM</div></div>
+  <div class="kpi"><div class="name">ROI estimado</div><div class="value" id="k-roi">—</div><div class="sub">Com base no CRM total</div></div>
+  <div class="kpi"><div class="name">Receita Compareceu</div><div class="value" id="k-revenue-attended">—</div><div class="sub">Somente quem compareceu</div></div>
+  <div class="kpi"><div class="name">ROI Compareceu</div><div class="value" id="k-roi-attended">—</div><div class="sub">ROI real por presença</div></div>
+ </div>
+ <div class="title">Resumo inteligente</div>
+ <div class="three" id="summary-cards"></div>
+
+ <div class="title">Radar da conta</div>
+ <p class="note">Leitura automática da saúde dos anúncios, inspirada no painel Command Center.</p>
+ <div class="two">
+  <div class="card radar-grid">
+   <div class="score-ring" id="score-ring" style="--score:0">
+    <div class="score-inner">
+     <div>
+      <div class="score-number" id="health-score">—</div>
+      <div class="score-label">saúde</div>
+     </div>
+    </div>
+   </div>
+   <div>
+    <div class="smart-title" id="health-title">Aguardando análise</div>
+    <div class="smart-text" id="health-text">O painel vai cruzar investimento, CTR, CPC, conversas e custo por conversa para dar uma nota da conta.</div>
+   </div>
+  </div>
+
+  <div class="card">
+   <div class="smart-title">Funil do anúncio</div>
+   <div class="smart-text" style="margin-bottom:14px">Da exposição até a conversa iniciada. Aqui fica claro onde o funil está vazando.</div>
+   <div class="funnel-grid">
+    <div class="funnel-row"><div class="funnel-label">Impressões</div><div class="bar"><span id="bar-impressions"></span></div><div class="funnel-value" id="f-impressions">—</div></div>
+    <div class="funnel-row"><div class="funnel-label">Alcance</div><div class="bar"><span id="bar-reach"></span></div><div class="funnel-value" id="f-reach">—</div></div>
+    <div class="funnel-row"><div class="funnel-label">Cliques</div><div class="bar"><span id="bar-clicks"></span></div><div class="funnel-value" id="f-clicks">—</div></div>
+    <div class="funnel-row"><div class="funnel-label">Conversas</div><div class="bar"><span id="bar-messages"></span></div><div class="funnel-value" id="f-messages">—</div></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="title">Insights inteligentes</div>
+ <p class="note">Alertas analíticos gerados pelo próprio painel com leitura de campanha, criativo, clique e conversa.</p>
+ <div class="smart-grid" id="insights-grid">
+  <div class="smart-card"><div class="smart-title">Sem dados ainda</div><div class="smart-text">Cole o token e rode a análise.</div></div>
+ </div>
+
+ <div class="title">Plano de ação inteligente</div>
+ <p class="note">Próximos passos práticos para melhorar resultado e transformar anúncio em agenda.</p>
+ <div class="three" id="action-grid">
+  <div class="card"><span class="action-tag">Aguardando</span><div class="name">Sem recomendações ainda</div><div class="meta">Depois da análise, este bloco mostra ações para campanha, criativo, público e WhatsApp.</div></div>
+ </div>
+
+
+ <div class="title">Insights financeiros do CRM</div>
+ <p class="note">Leitura complementar de receita, comparecimento e ROI real da clínica.</p>
+ <div class="three" id="financial-insights-grid">
+  <div class="card"><div class="name">Sem dados ainda</div><div class="meta">Cadastre leads com valor e marque quem compareceu.</div></div>
+ </div>
+</section>
+
+<section id="alerts" class="section">
+ <div class="title">Central de alertas</div>
+ <p class="note">Alertas criados automaticamente a partir das campanhas.</p>
+ <div class="filters"><input class="input" id="alert-search" placeholder="Buscar alerta..." oninput="renderAlerts()"><select class="select" id="alert-severity" onchange="renderAlerts()"><option value="all">Todos</option><option value="high">Crítico</option><option value="medium">Atenção</option><option value="low">Bom</option></select><button class="btn btn2" onclick="exportAlerts()">Exportar alertas</button><button class="btn btn2" onclick="clearViewedAlerts()">Limpar vistos</button></div>
+ <div class="list" id="alert-list"><div class="empty">Rode a análise para gerar alertas.</div></div>
+</section>
+
+<section id="crm" class="section">
+ <div class="title">CRM local de leads</div>
+ <p class="note">Agora o CRM também registra Serviço, Profissional, Valor e Data do agendamento.</p>
+ <div class="crm-grid">
+  <div class="panel">
+   <div class="name">Novo lead/agendamento</div><br>
+   <div class="crm-form">
+    <input class="input" id="lead-name" placeholder="Nome">
+    <input class="input" id="lead-phone" placeholder="Telefone/WhatsApp">
+    <input class="input" id="lead-origin" placeholder="Origem/Campanha">
+    <div class="crm-extra-grid">
+      <input class="input" id="lead-service" placeholder="Serviço">
+      <input class="input" id="lead-professional" placeholder="Profissional">
+      <input class="input" id="lead-value" type="number" step="0.01" placeholder="Valor R$">
+      <input class="input" id="lead-appointment-date" type="date" placeholder="Data do agendamento">
+      <select class="select" id="lead-attended"><option value="Não">Compareceu? Não</option><option value="Sim">Compareceu? Sim</option></select>
+    </div>
+    <select class="select" id="lead-status"><option>Novo</option><option>Conversando</option><option>Agendado</option><option>Compareceu</option><option>Retorno</option><option>Perdido</option></select>
+    <textarea id="lead-notes" placeholder="Observações"></textarea>
+    <button class="btn" onclick="addLead()">Adicionar lead</button>
+    <button class="btn btn2" onclick="exportLeads()">Exportar CRM CSV</button>
+   </div>
+  </div>
+  <div class="panel">
+   <div class="name">Importar leads por CSV</div>
+   <p class="note">Formato: nome;telefone;origem;servico;profissional;valor;data_agendamento;compareceu;status;observacoes</p>
+   <textarea id="csv-import" placeholder="Maria;43999999999;Campanha Unha;Unha encravada;Tania;130;2026-05-22;Sim;Agendado;Quer avaliação"></textarea>
+   <button class="btn" onclick="importCSVLeads()">Importar</button>
+   <div class="footer">Os dados ficam salvos no navegador. Não é banco de dados online.</div>
+  </div>
+ </div>
+ <div class="title">Leads</div>
+ <div id="crm-table"></div>
+</section>
+
+<section id="campaigns" class="section">
+ <div class="title">Campanhas diagnosticadas</div>
+ <div class="filters">
+  <input class="input" id="campaign-search" placeholder="Buscar campanha..." oninput="renderCampaigns()">
+  <select class="select" id="sort" onchange="renderCampaigns()"><option value="spend">Gasto</option><option value="score">Nota</option><option value="messages">Conversas</option><option value="cpc">CPC</option></select>
+  <select class="select" id="problem" onchange="renderCampaigns()"><option value="all">Todos</option><option value="winner">Boas</option><option value="attention">Atenção</option><option value="problem">Problema</option></select>
+  <button class="btn btn2" onclick="exportCampaigns()">Exportar CSV</button>
+ </div>
+ <div class="list" id="campaign-list"><div class="empty">Rode a análise para carregar campanhas.</div></div>
+</section>
+
+<section id="strategy" class="section">
+ <div class="title">Estratégia recomendada</div>
+ <div class="three" id="strategy-cards"></div>
+</section>
+</div>
+
+<script>
+const API_VERSION='v25.0';
+let campaigns=[];
+let alerts=[];
+let leads=JSON.parse(localStorage.getItem('levity_leads')||'[]');
+
+const BRL=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+const NUM=new Intl.NumberFormat('pt-BR');
+
+function init(){
+ document.getElementById('token').value=localStorage.getItem('levity_token')||'';
+ document.getElementById('account').value=localStorage.getItem('levity_account')||'1339519327381059';
+ document.getElementById('acc-label').textContent=document.getElementById('account').value;
+ document.getElementById('apps-script-url').value=localStorage.getItem('levity_apps_script_url')||'';
+ toggleCustomDates(); renderLeads(); renderStrategy(); renderDashboard();
+}
+function money(v){return BRL.format(Number(v||0))}
+function n(v){return NUM.format(Math.round(Number(v||0)))}
+function pct(v){return `${Number(v||0).toFixed(2).replace('.',',')}%`}
+function div(a,b){return Number(b||0)>0?Number(a||0)/Number(b||0):0}
+function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
+function showTab(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function token(){return document.getElementById('token').value.trim()}
+function account(){return document.getElementById('account').value.trim().replace('act_','')}
+function preset(){return document.getElementById('preset').value}
+function toggleCustomDates(){
+ const isCustom=preset()==='custom';
+ const startBox=document.getElementById('custom-dates-box');
+ const endBox=document.getElementById('custom-dates-box-end');
+ if(startBox)startBox.style.display=isCustom?'block':'none';
+ if(endBox)endBox.style.display=isCustom?'block':'none';
+}
+function getInsightsParams(){
+ if(preset()==='custom'){
+  const since=document.getElementById('date-start').value;
+  const until=document.getElementById('date-end').value;
+  if(!since || !until) throw new Error('Escolha data de início e data de fim para o período personalizado.');
+  return {
+   level:'campaign',
+   time_range: JSON.stringify({since, until}),
+   fields:'campaign_id,campaign_name,spend,impressions,reach,frequency,clicks,inline_link_clicks,ctr,cpc,cpm,actions',
+   limit:200
+  };
+ }
+ return {
+  level:'campaign',
+  date_preset:preset(),
+  fields:'campaign_id,campaign_name,spend,impressions,reach,frequency,clicks,inline_link_clicks,ctr,cpc,cpm,actions',
+  limit:200
+ };
+}
+function val(id){return document.getElementById(id).value.trim()}
+function saveLeads(){localStorage.setItem('levity_leads',JSON.stringify(leads.map(l=>({...l,editing:false}))))}
+
+function extractAction(actions=[],keys=[]){
+ if(!Array.isArray(actions))return 0;
+ return actions.filter(a=>keys.some(k=>String(a.action_type||'').includes(k))).reduce((s,a)=>s+Number(a.value||0),0)
+}
+function normalize(row={}){
+ const spend=Number(row.spend||0), impressions=Number(row.impressions||0), reach=Number(row.reach||0);
+ const clicks=Number(row.inline_link_clicks||row.link_clicks||row.clicks||0), ctr=Number(row.ctr||0);
+ const cpc=clicks>0?spend/clicks:Number(row.cpc||0);
+ const freq=Number(row.frequency||0);
+ const messages=extractAction(row.actions,['messaging_conversation_started','onsite_conversion.messaging','whatsapp','messaging_first_reply']);
+ const cpmg=messages>0?spend/messages:0;
+ return {spend,impressions,reach,clicks,ctr,cpc,frequency:freq,messages,cpmg}
+}
+function score(m){
+ let s=m.spend?50:20;
+ if(m.ctr>=2)s+=15;else if(m.ctr>=1)s+=7;else if(m.impressions>1000)s-=12;
+ if(m.cpc&&m.cpc<=.8)s+=12;else if(m.cpc<=1.5)s+=5;else if(m.cpc>1.5)s-=10;
+ if(m.messages>0)s+=18;if(m.cpmg&&m.cpmg<=10)s+=12;else if(m.cpmg>20)s-=12;
+ if(m.clicks>=20&&m.messages===0)s-=22;if(m.frequency>3.5&&m.ctr<1)s-=8;
+ return Math.max(0,Math.min(100,Math.round(s)))
+}
+function typeOf(c){const m=c.metrics;if(c.score>=70&&m.messages>0)return'winner';if(m.clicks>=20&&m.messages===0)return'problem';if(m.ctr<1&&m.impressions>1000)return'problem';if(m.cpc>1.5)return'attention';if(c.score<45)return'problem';return'attention'}
+function diagnosis(c){
+ const m=c.metrics;
+ if(!m.spend)return['Sem leitura','Sem gasto no período. Verifique orçamento, status e público.'];
+ if(m.clicks>=20&&m.messages===0)return['Clique sem conversa','Revise CTA, mensagem inicial do WhatsApp e promessa do anúncio.'];
+ if(m.ctr<1&&m.impressions>1000)return['Criativo fraco','Teste imagem mais direta, dor específica e primeira frase mais forte.'];
+ if(m.cpc>1.5)return['CPC alto','Teste público mais qualificado, criativo novo ou oferta mais objetiva.'];
+ if(m.messages>0&&m.cpmg<=10)return['Campanha saudável','Boa candidata para aumentar orçamento aos poucos.'];
+ if(m.messages>0&&m.cpmg>20)return['Conversa cara','Compare com campanhas mais baratas antes de escalar.'];
+ return['Observação','Compare com outras campanhas antes de decidir.'];
+}
+async function apiGet(path,params={}){
+ const url=new URL(`https://graph.facebook.com/${API_VERSION}/${path}`);
+ Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=='')url.searchParams.set(k,v)});
+ url.searchParams.set('access_token',token());
+ const res=await fetch(url); const data=await res.json();
+ if(data.error)throw new Error(data.error.message);
+ return data;
+}
+async function fetchData(){
+ const d=document.getElementById('dot'), st=document.getElementById('status'), er=document.getElementById('error');
+ er.innerHTML=''; d.className='dot'; st.textContent='Buscando dados e gerando diagnóstico...';
+ try{
+  if(!token())throw new Error('Cole seu token antes de analisar.');
+  if(!account())throw new Error('Informe a conta de anúncios.');
+  localStorage.setItem('levity_token',token()); localStorage.setItem('levity_account',account());
+  document.getElementById('acc-label').textContent=account();
+  const camp=await apiGet(`act_${account()}/campaigns`,{fields:'id,name,status,objective,daily_budget,lifetime_budget,created_time',limit:200});
+  const ins=await apiGet(`act_${account()}/insights`,getInsightsParams());
+  const map=new Map(); (ins.data||[]).forEach(r=>{if(r.campaign_id)map.set(r.campaign_id,normalize(r))});
+  campaigns=(camp.data||[]).map(c=>{const metrics=map.get(c.id)||normalize();const sc=score(metrics);return{...c,metrics,score:sc,problem:typeOf({metrics,score:sc})}});
+  generateAlerts(); renderDashboard(); renderAlerts(); renderCampaigns(); renderStrategy();
+  d.className='dot done'; st.textContent=`Análise concluída: ${campaigns.length} campanhas avaliadas.`;
+ }catch(e){d.className='dot error';st.textContent='Erro na análise.';er.innerHTML=`<div class="error">⚠️ ${esc(e.message)}</div>`}
+}
+function totals(){return campaigns.reduce((a,c)=>{const m=c.metrics;a.spend+=m.spend;a.impressions+=m.impressions;a.clicks+=m.clicks;a.messages+=m.messages;return a},{spend:0,impressions:0,clicks:0,messages:0})}
+function crmRevenue(){return leads.reduce((sum,l)=>sum+Number(String(l.value||0).replace(',','.')),0)}
+function crmRevenueAttended(){return leads.filter(l=>l.attended==='Sim' || l.status==='Compareceu').reduce((sum,l)=>sum+Number(String(l.value||0).replace(',','.')),0)}
+function attendedCount(){return leads.filter(l=>l.attended==='Sim' || l.status==='Compareceu').length}
+function renderDashboard(){
+ const t=totals(), ctr=div(t.clicks,t.impressions)*100, cpmg=div(t.spend,t.messages), revenue=crmRevenue(), revenueAttended=crmRevenueAttended();
+ const roi=t.spend>0?((revenue-t.spend)/t.spend)*100:0;
+ const roiAttended=t.spend>0?((revenueAttended-t.spend)/t.spend)*100:0;
+ document.getElementById('k-spend').textContent=money(t.spend);
+ document.getElementById('k-clicks').textContent=n(t.clicks);
+ document.getElementById('k-ctr').textContent=pct(ctr);
+ document.getElementById('k-msg').textContent=n(t.messages);
+ document.getElementById('k-revenue').textContent=money(revenue);
+ document.getElementById('k-roi').textContent=t.spend>0?pct(roi):'—';
+ document.getElementById('k-revenue-attended').textContent=money(revenueAttended);
+ document.getElementById('k-roi-attended').textContent=t.spend>0?pct(roiAttended):'—';
+ const best=campaigns.filter(c=>c.metrics.messages>0).sort((a,b)=>a.metrics.cpmg-b.metrics.cpmg)[0];
+ const cards=[
+  ['Pulso geral',`${campaigns.length} campanhas. Gasto ${money(t.spend)}, ${n(t.clicks)} cliques e ${n(t.messages)} conversas.`],
+  ['Receita no CRM',`Total registrado em agendamentos/atendimentos: ${money(revenue)}. Receita por comparecimento: ${money(revenueAttended)}.`],
+  best?['Melhor campanha',`“${best.name}” tem menor custo por conversa: ${money(best.metrics.cpmg)}.`]:['Sem conversa registrada','Confira evento, objetivo da campanha ou ação de WhatsApp.']
+ ];
+ document.getElementById('summary-cards').innerHTML=cards.map(c=>`<div class="card"><div class="name">${esc(c[0])}</div><div class="meta">${esc(c[1])}</div></div>`).join('');
+ renderAdvancedDashboard(t,ctr,cpmg);
+ renderFinancialInsights(t,ctr,cpmg,revenue,revenueAttended,roi,roiAttended);
+}
+
+function renderFinancialInsights(t,ctr,cpmg,revenue,revenueAttended,roi,roiAttended){
+ const grid=document.getElementById('financial-insights-grid');
+ if(!grid)return;
+ const withSpend=campaigns.filter(c=>c.metrics.spend>0);
+ const best=[...withSpend].filter(c=>c.metrics.messages>0).sort((a,b)=>a.metrics.cpmg-b.metrics.cpmg)[0];
+ const leak=[...withSpend].filter(c=>c.metrics.clicks>=20&&c.metrics.messages===0).sort((a,b)=>b.metrics.clicks-a.metrics.clicks)[0];
+ const costly=[...withSpend].filter(c=>c.metrics.cpc>1.5).sort((a,b)=>b.metrics.cpc-a.metrics.cpc)[0];
+ const totalLeads=leads.length;
+ const attended=attendedCount();
+ const cards=[];
+
+ cards.push(['Leitura financeira', revenueAttended>0
+  ? `Receita confirmada por comparecimento: ${money(revenueAttended)}. ROI por comparecimento: ${t.spend>0?pct(roiAttended):'—'}.`
+  : 'Ainda não há receita confirmada por comparecimento. Marque Compareceu = Sim para medir ROI real.']);
+
+ cards.push(['Conversão do CRM', totalLeads>0
+  ? `${attended} de ${totalLeads} lead(s) compareceram. Taxa de comparecimento: ${pct(div(attended,totalLeads)*100)}.`
+  : 'Nenhum lead no CRM ainda. Cadastre os contatos para medir agendamento e comparecimento.']);
+
+ if(best){
+  cards.push(['Campanha modelo', `“${best.name}” tem melhor custo por conversa: ${money(best.metrics.cpmg)}. Estude esse criativo e replique a lógica.`]);
+ }else{
+  cards.push(['Sem campanha modelo', 'Ainda não há campanha com conversa detectada. Verifique evento de WhatsApp ou período selecionado.']);
+ }
+
+ if(leak){
+  cards.push(['Vazamento crítico', `“${leak.name}” teve ${n(leak.metrics.clicks)} cliques e 0 conversas. O pós-clique precisa de revisão.`]);
+ }
+
+ if(costly){
+  cards.push(['CPC alto', `“${costly.name}” está com CPC de ${money(costly.metrics.cpc)}. Teste criativo novo e público mais qualificado.`]);
+ }
+
+ if(t.impressions>1000&&ctr<1){
+  cards.push(['Criativo sem força', `CTR geral em ${pct(ctr)}. O anúncio aparece, mas não convence. Trabalhe imagem, promessa e primeira frase.`]);
+ }
+
+ if(revenue>0 && revenueAttended===0){
+  cards.push(['Receita ainda não confirmada', `Existem ${money(revenue)} em valores no CRM, mas nenhum marcado como compareceu. O ROI estimado pode estar otimista.`]);
+ }
+
+ if(roiAttended>0){
+  cards.push(['Conta com retorno real', `Com base nos comparecimentos, cada real investido já começou a retornar. Próximo passo: separar receita por campanha/origem.`]);
+ }
+
+ grid.innerHTML=cards.slice(0,6).map(c=>`<div class="card"><div class="name">${esc(c[0])}</div><div class="meta">${esc(c[1])}</div></div>`).join('');
+}
+
+function accountHealthScore(t){
+ if(t.spend===0)return 15;
+ const ctr=div(t.clicks,t.impressions)*100;
+ const cpc=div(t.spend,t.clicks);
+ const cpmg=div(t.spend,t.messages);
+ let s=50;
+ if(ctr>=2)s+=16;else if(ctr>=1)s+=8;else s-=10;
+ if(cpc>0&&cpc<=.8)s+=12;else if(cpc<=1.5)s+=5;else s-=10;
+ if(t.messages>0)s+=18;else if(t.clicks>=20)s-=22;
+ if(cpmg>0&&cpmg<=10)s+=12;else if(cpmg>20)s-=10;
+ return Math.max(0,Math.min(100,Math.round(s)));
+}
+function renderAdvancedDashboard(t,ctr,cpmg){
+ const score=accountHealthScore(t);
+ const scoreEl=document.getElementById('health-score');
+ if(!scoreEl)return;
+
+ document.getElementById('health-score').textContent=score;
+ document.getElementById('score-ring').style.setProperty('--score',score);
+
+ const title=score>=80?'Conta com forte potencial de escala'
+  :score>=65?'Conta promissora, mas com ajustes'
+  :score>=45?'Conta em zona de atenção'
+  :'Conta com vazamento no funil';
+
+ const text=score>=80?'Os indicadores mostram boa eficiência. O foco agora é escalar com cuidado, preservar o custo por conversa e replicar os melhores criativos.'
+  :score>=65?'Existe tração, mas ainda há espaço para melhorar criativos, públicos ou mensagem do WhatsApp.'
+  :score>=45?'A conta tem sinais mistos. Antes de aumentar orçamento, corrija gargalos de clique, CTR ou conversão em conversa.'
+  :'Há risco de gastar sem gerar atendimento. Priorize diagnóstico de criativo, CTA e mensagem inicial.';
+
+ document.getElementById('health-title').textContent=title;
+ document.getElementById('health-text').textContent=text;
+
+ document.getElementById('f-impressions').textContent=n(t.impressions);
+ document.getElementById('f-reach').textContent=n(t.reach);
+ document.getElementById('f-clicks').textContent=n(t.clicks);
+ document.getElementById('f-messages').textContent=n(t.messages);
+
+ const max=Math.max(t.impressions,1);
+ document.getElementById('bar-impressions').style.setProperty('--w','100%');
+ document.getElementById('bar-reach').style.setProperty('--w',`${Math.max(3,div(t.reach,max)*100)}%`);
+ document.getElementById('bar-clicks').style.setProperty('--w',`${Math.max(3,div(t.clicks,max)*100)}%`);
+ document.getElementById('bar-messages').style.setProperty('--w',`${Math.max(3,div(t.messages,max)*100)}%`);
+
+ renderSmartInsights(t,ctr,cpmg);
+ renderSmartActions(t,ctr,cpmg);
+}
+function renderSmartInsights(t,ctr,cpmg){
+ const grid=document.getElementById('insights-grid');
+ if(!grid)return;
+ const withSpend=campaigns.filter(c=>c.metrics.spend>0);
+ const winners=campaigns.filter(c=>c.problem==='winner');
+ const problems=campaigns.filter(c=>c.problem==='problem');
+ const best=[...withSpend].filter(c=>c.metrics.messages>0).sort((a,b)=>a.metrics.cpmg-b.metrics.cpmg)[0];
+ const leak=[...withSpend].filter(c=>c.metrics.clicks>=20&&c.metrics.messages===0).sort((a,b)=>b.metrics.clicks-a.metrics.clicks)[0];
+ const costly=[...withSpend].filter(c=>c.metrics.cpc>1.5).sort((a,b)=>b.metrics.cpc-a.metrics.cpc)[0];
+ const fatigue=[...withSpend].filter(c=>c.metrics.frequency>3.5&&c.metrics.ctr<1).sort((a,b)=>b.metrics.frequency-a.metrics.frequency)[0];
+
+ const cards=[];
+ cards.push({title:'Pulso geral',text:`${campaigns.length} campanhas encontradas. ${winners.length} com potencial de escala e ${problems.length} exigindo correção. Gasto total: ${money(t.spend)}.`,priority:false,good:false});
+ if(best){
+  cards.push({title:'Campanha modelo',text:`“${best.name}” tem o melhor custo por conversa: ${money(best.metrics.cpmg)}. Estude público, criativo e texto para replicar.`,priority:false,good:true});
+ }else{
+  cards.push({title:'Sem conversa registrada',text:'O painel não encontrou conversas iniciadas. Pode ser falta de evento, campanha com outro objetivo ou problema na captura das ações de mensagem.',priority:true,good:false});
+ }
+ if(leak)cards.push({title:'Vazamento crítico',text:`“${leak.name}” gerou ${n(leak.metrics.clicks)} cliques e 0 conversas. O gargalo provável está no CTA, no WhatsApp ou na promessa do anúncio.`,priority:true,good:false});
+ if(costly)cards.push({title:'Clique caro',text:`“${costly.name}” está com CPC de ${money(costly.metrics.cpc)}. Antes de escalar, teste criativo novo e público mais qualificado.`,priority:true,good:false});
+ if(t.impressions>1000&&ctr<1)cards.push({title:'Criativo sem força',text:`O CTR geral está em ${pct(ctr)}. O anúncio aparece, mas não convence. Trabalhe imagem, título e promessa principal.`,priority:true,good:false});
+ if(fatigue)cards.push({title:'Possível fadiga de público',text:`“${fatigue.name}” tem frequência ${fatigue.metrics.frequency.toFixed(2)} e CTR baixo. Pode ser hora de renovar criativo ou abrir público.`,priority:true,good:false});
+ if(t.messages>0&&cpmg<=10)cards.push({title:'Eficiência saudável',text:`O custo médio por conversa está em ${money(cpmg)}. A conta tem sinal de tração e pode ganhar testes de escala com cuidado.`,priority:false,good:true});
+
+ grid.innerHTML=cards.map(c=>`<div class="smart-card ${c.priority?'priority':''} ${c.good?'good-priority':''}"><div class="smart-title">${esc(c.title)}</div><div class="smart-text">${esc(c.text)}</div></div>`).join('');
+}
+function renderSmartActions(t,ctr,cpmg){
+ const grid=document.getElementById('action-grid');
+ if(!grid)return;
+ const actions=[];
+ if(t.clicks>=20&&t.messages===0){
+  actions.push(['Urgente','Consertar o pós-clique','Teste a mensagem automática do WhatsApp, encurte a primeira resposta e coloque uma pergunta simples: “Olá, quer agendar avaliação para unha/pé?”']);
+ }
+ if(ctr<1&&t.impressions>1000){
+  actions.push(['Criativo','Criar 3 variações de anúncio','Faça um criativo para dor, um para antes/depois e outro educativo. Exemplo: “Unha inflamada não melhora sozinha. Avalie antes de piorar.”']);
+ }
+ if(cpmg>20){
+  actions.push(['Eficiência','Reduzir custo por conversa','Compare campanhas com conversa mais barata. Copie público, posicionamento e promessa das melhores antes de aumentar orçamento.']);
+ }
+ actions.push(['Rotina','Ritual semanal de análise','Toda semana olhe: gasto, CTR, CPC, conversas, custo por conversa e campanhas com clique sem atendimento.']);
+ actions.push(['CRM','Adicionar dados de agendamento','Cruze Meta Ads com CRM: conversas, agendados, comparecimentos, ticket médio e receita.']);
+ actions.push(['Automação futura','Alertas e CRM online','Com backend/API, dá para criar alerta de lead novo, salvar em planilha e medir quem virou cliente.']);
+
+ grid.innerHTML=actions.slice(0,6).map(a=>`<div class="card"><span class="action-tag">${esc(a[0])}</span><div class="name">${esc(a[1])}</div><div class="meta">${esc(a[2])}</div></div>`).join('');
+}
+
+
+function generateAlerts(){
+ alerts=[];
+ campaigns.forEach(c=>{
+  const m=c.metrics;
+  if(m.clicks>=20&&m.messages===0)alerts.push({sev:'high',title:'Clique sem conversa',text:`${c.name}: ${n(m.clicks)} cliques e 0 conversas.`,campaign:c.name});
+  if(m.ctr<1&&m.impressions>1000)alerts.push({sev:'high',title:'CTR baixo',text:`${c.name}: CTR ${pct(m.ctr)} com ${n(m.impressions)} impressões.`,campaign:c.name});
+  if(m.cpc>1.5)alerts.push({sev:'medium',title:'CPC alto',text:`${c.name}: CPC ${money(m.cpc)}.`,campaign:c.name});
+  if(m.messages>0&&m.cpmg<=10)alerts.push({sev:'low',title:'Boa oportunidade',text:`${c.name}: custo por conversa ${money(m.cpmg)}.`,campaign:c.name});
+ });
+ localStorage.setItem('levity_alerts_last',JSON.stringify(alerts));
+}
+function renderAlerts(){
+ const q=(document.getElementById('alert-search')?.value||'').toLowerCase(), sev=document.getElementById('alert-severity')?.value||'all';
+ let arr=alerts.filter(a=>(sev==='all'||a.sev===sev)&&(a.title+a.text+a.campaign).toLowerCase().includes(q));
+ document.getElementById('alert-list').innerHTML=arr.length?arr.map(a=>`<div class="item alert ${a.sev==='high'?'high':a.sev==='low'?'low':''}"><div class="item-head"><div><div class="name">${esc(a.title)}</div><div class="meta">${esc(a.text)}</div></div><span class="badge ${a.sev==='high'?'bad':a.sev==='low'?'good':'warn'}">${a.sev==='high'?'Crítico':a.sev==='low'?'Bom':'Atenção'}</span></div></div>`).join(''):'<div class="empty">Nenhum alerta encontrado.</div>';
+}
+function addLead(){
+ const phone=val('lead-phone');
+ const lead={
+  id:Date.now(),date:new Date().toLocaleString('pt-BR'),
+  name:val('lead-name') || (phone ? `Lead ${phone}` : 'Lead sem identificação'),
+  phone,origin:val('lead-origin'),service:val('lead-service'),professional:val('lead-professional'),
+  value:val('lead-value'),appointmentDate:val('lead-appointment-date'),attended:val('lead-attended'),
+  status:val('lead-status'),notes:val('lead-notes')
+ };
+ if(!lead.name&&!lead.phone)return alert('Preencha pelo menos nome ou telefone.');
+ leads.unshift(lead);saveLeads();
+ ['lead-name','lead-phone','lead-origin','lead-service','lead-professional','lead-value','lead-appointment-date','lead-notes'].forEach(id=>document.getElementById(id).value='');
+ const attendedEl=document.getElementById('lead-attended'); if(attendedEl) attendedEl.value='Não';
+ renderLeads();renderDashboard();
+}
+function renderLeads(){
+ const el=document.getElementById('crm-table'); if(!el)return;
+ if(!leads.length){el.innerHTML='<div class="empty">Nenhum lead cadastrado ainda.</div>';return}
+ el.innerHTML=`<div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Nome</th><th>Telefone</th><th>Origem</th><th>Serviço</th><th>Profissional</th><th>Valor</th><th>Agendamento</th><th>Compareceu</th><th>Status</th><th>Obs.</th><th>Ações</th></tr></thead><tbody>${leads.map(l=>{
+  if(l.editing){
+   return `<tr><td>${esc(l.date)}</td><td><input class="input" id="edit-name-${l.id}" value="${esc(l.name)}"></td><td><input class="input" id="edit-phone-${l.id}" value="${esc(l.phone)}"></td><td><input class="input" id="edit-origin-${l.id}" value="${esc(l.origin)}"></td><td><input class="input" id="edit-service-${l.id}" value="${esc(l.service||'')}"></td><td><input class="input" id="edit-professional-${l.id}" value="${esc(l.professional||'')}"></td><td><input class="input" type="number" step="0.01" id="edit-value-${l.id}" value="${esc(l.value||'')}"></td><td><input class="input" type="date" id="edit-appointment-${l.id}" value="${esc(l.appointmentDate||'')}"></td><td><select id="edit-attended-${l.id}"><option ${l.attended==='Não'?'selected':''}>Não</option><option ${l.attended==='Sim'?'selected':''}>Sim</option></select></td><td><select id="edit-status-${l.id}"><option ${l.status==='Novo'?'selected':''}>Novo</option><option ${l.status==='Conversando'?'selected':''}>Conversando</option><option ${l.status==='Agendado'?'selected':''}>Agendado</option><option ${l.status==='Compareceu'?'selected':''}>Compareceu</option><option ${l.status==='Retorno'?'selected':''}>Retorno</option><option ${l.status==='Perdido'?'selected':''}>Perdido</option></select></td><td><input class="input" id="edit-notes-${l.id}" value="${esc(l.notes)}"></td><td><button class="btn btn2" onclick="saveLeadEdit(${l.id})">Salvar</button> <button class="btn btn2" onclick="cancelLeadEdit(${l.id})">Cancelar</button></td></tr>`;
+  }
+  return `<tr><td>${esc(l.date)}</td><td>${esc(l.name)}</td><td>${esc(l.phone)}</td><td>${esc(l.origin)}</td><td>${esc(l.service||'')}</td><td>${esc(l.professional||'')}</td><td>${l.value?money(Number(l.value)):''}</td><td>${esc(l.appointmentDate||'')}</td><td><span class="badge ${l.attended==='Sim'?'good':'warn'}">${esc(l.attended||'Não')}</span></td><td><select onchange="updateLead(${l.id},this.value)"><option ${l.status==='Novo'?'selected':''}>Novo</option><option ${l.status==='Conversando'?'selected':''}>Conversando</option><option ${l.status==='Agendado'?'selected':''}>Agendado</option><option ${l.status==='Compareceu'?'selected':''}>Compareceu</option><option ${l.status==='Retorno'?'selected':''}>Retorno</option><option ${l.status==='Perdido'?'selected':''}>Perdido</option></select></td><td>${esc(l.notes)}</td><td><button class="btn btn2" onclick="editLead(${l.id})">Editar</button> <button class="btn btn2" onclick="openWhatsApp('${esc(l.phone)}')">WhatsApp</button> <button class="btn btn2" onclick="deleteLead(${l.id})">Excluir</button></td></tr>`;
+ }).join('')}</tbody></table></div>`;
+}
+function updateLead(id,status){leads=leads.map(l=>l.id===id?{...l,status}:l);saveLeads();renderDashboard()}
+function editLead(id){leads=leads.map(l=>l.id===id?{...l,editing:true}:l);renderLeads()}
+function cancelLeadEdit(id){leads=leads.map(l=>l.id===id?{...l,editing:false}:l);renderLeads()}
+function saveLeadEdit(id){
+ leads=leads.map(l=>{
+  if(l.id!==id)return l;
+  const phone=document.getElementById(`edit-phone-${id}`).value.trim();
+  return {...l,editing:false,name:document.getElementById(`edit-name-${id}`).value.trim() || (phone ? `Lead ${phone}` : 'Lead sem identificação'),phone,origin:document.getElementById(`edit-origin-${id}`).value.trim(),service:document.getElementById(`edit-service-${id}`).value.trim(),professional:document.getElementById(`edit-professional-${id}`).value.trim(),value:document.getElementById(`edit-value-${id}`).value.trim(),appointmentDate:document.getElementById(`edit-appointment-${id}`).value,attended:document.getElementById(`edit-attended-${id}`).value,status:document.getElementById(`edit-status-${id}`).value,notes:document.getElementById(`edit-notes-${id}`).value.trim()};
+ });
+ saveLeads();renderLeads();renderDashboard();
+}
+function openWhatsApp(phone){const clean=String(phone||'').replace(/\D/g,'');if(!clean)return alert('Este lead não tem telefone.');window.open(`https://wa.me/55${clean}`,'_blank')}
+function deleteLead(id){if(confirm('Excluir lead?')){leads=leads.filter(l=>l.id!==id);saveLeads();renderLeads();renderDashboard()}}
+function importCSVLeads(){
+ const txt=val('csv-import'); if(!txt)return;
+ txt.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{
+  const [name,phone,origin,service,professional,value,appointmentDate,attended,status,notes]=line.split(';');
+  leads.unshift({id:Date.now()+Math.random(),date:new Date().toLocaleString('pt-BR'),name:name||'',phone:phone||'',origin:origin||'',service:service||'',professional:professional||'',value:value||'',appointmentDate:appointmentDate||'',attended:attended||'Não',status:status||'Novo',notes:notes||''});
+ });
+ saveLeads();document.getElementById('csv-import').value='';renderLeads();renderDashboard();
+}
+function renderCampaigns(){
+ const q=(document.getElementById('campaign-search')?.value||'').toLowerCase(), sort=document.getElementById('sort')?.value||'spend', prob=document.getElementById('problem')?.value||'all';
+ let arr=[...campaigns].filter(c=>(prob==='all'||c.problem===prob)&&String(c.name).toLowerCase().includes(q));
+ arr.sort((a,b)=>sort==='score'?b.score-a.score:sort==='messages'?b.metrics.messages-a.metrics.messages:sort==='cpc'?b.metrics.cpc-a.metrics.cpc:b.metrics.spend-a.metrics.spend);
+ document.getElementById('campaign-list').innerHTML=arr.length?arr.map(c=>{const m=c.metrics,d=diagnosis(c),cls=c.score>=70?'good':c.score>=45?'warn':'bad';return `<div class="item"><div class="item-head"><div><div class="name">${esc(c.name)}</div><div class="meta">${esc(c.objective||'Objetivo não informado')} · ${esc(c.status||'')}</div></div><span class="badge ${cls}">Nota ${c.score}</span></div><div class="pills"><div class="pill"><div class="pl">Gasto</div><div class="pv">${money(m.spend)}</div></div><div class="pill"><div class="pl">Impressões</div><div class="pv">${n(m.impressions)}</div></div><div class="pill"><div class="pl">Cliques</div><div class="pv">${n(m.clicks)}</div></div><div class="pill"><div class="pl">CTR</div><div class="pv">${pct(m.ctr)}</div></div><div class="pill"><div class="pl">CPC</div><div class="pv">${money(m.cpc)}</div></div><div class="pill"><div class="pl">Conversas</div><div class="pv">${n(m.messages)}</div></div><div class="pill"><div class="pl">Custo conv.</div><div class="pv">${m.messages?money(m.cpmg):'—'}</div></div></div><div class="meta"><strong>Diagnóstico:</strong> ${esc(d[0])}<br><strong>Ação:</strong> ${esc(d[1])}</div></div>`}).join(''):'<div class="empty">Nenhuma campanha encontrada.</div>';
+}
+function renderStrategy(){
+ const cards=[
+  ['1. CRM com receita','Preencha valor, serviço, profissional e data para começar a medir receita por origem.'],
+  ['2. ROI real','Cruze gasto de anúncio com valores agendados e atendimentos comparecidos.'],
+  ['3. Próximo nível','Adicionar campo compareceu e forma de pagamento para fechar a análise financeira.']
+ ];
+ const el=document.getElementById('strategy-cards'); if(el)el.innerHTML=cards.map(c=>`<div class="card"><div class="name">${c[0]}</div><div class="meta">${c[1]}</div></div>`).join('');
+}
+function downloadCSV(name,headers,rows){
+ const csv=[headers,...rows].map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(';')).join('\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+function exportLeads(){downloadCSV('crm-leads-levity.csv',['data','nome','telefone','origem','servico','profissional','valor','data_agendamento','compareceu','status','observacoes'],leads.map(l=>[l.date,l.name,l.phone,l.origin,l.service||'',l.professional||'',l.value||'',l.appointmentDate||'',l.attended||'Não',l.status,l.notes]))}
+function exportAlerts(){downloadCSV('alertas-meta-ads.csv',['severidade','titulo','campanha','descricao'],alerts.map(a=>[a.sev,a.title,a.campaign,a.text]))}
+function exportCampaigns(){downloadCSV('campanhas-diagnostico.csv',['campanha','status','objetivo','gasto','impressoes','cliques','ctr','cpc','conversas','custo_conversa','nota','diagnostico','acao'],campaigns.map(c=>{const d=diagnosis(c),m=c.metrics;return[c.name,c.status,c.objective,m.spend,m.impressions,m.clicks,m.ctr,m.cpc,m.messages,m.cpmg,c.score,d[0],d[1]]}))}
+function clearViewedAlerts(){alerts=[];renderAlerts()}
+
+function scriptUrl(){return document.getElementById('apps-script-url').value.trim()}
+function setSheetsStatus(msg){document.getElementById('sheets-status').textContent=msg}
+function saveScriptUrl(){const url=scriptUrl();if(!url)return alert('Cole a URL do Apps Script primeiro.');localStorage.setItem('levity_apps_script_url',url);setSheetsStatus('URL salva. Você já pode sincronizar.')}
+async function postToSheets(payload){const url=scriptUrl() || localStorage.getItem('levity_apps_script_url') || '';if(!url)throw new Error('Cole e salve a URL do Apps Script antes de sincronizar.');await fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});return true}
+async function syncLeadsToSheets(){
+ try{
+  if(!leads.length)return alert('Não há leads no CRM para enviar.');
+  saveScriptUrl();setSheetsStatus(`Enviando ${leads.length} lead(s)...`);
+  for(const l of leads){await postToSheets({tipo:'lead',nome:l.name,telefone:l.phone,origem:l.origin,servico:l.service||'',profissional:l.professional||'',valor:l.value||'',dataAgendamento:l.appointmentDate||'',compareceu:l.attended||'Não',status:l.status,observacoes:l.notes,data:l.date});}
+  setSheetsStatus(`CRM enviado: ${leads.length} lead(s).`);
+ }catch(e){setSheetsStatus('Erro ao enviar CRM: '+e.message);alert(e.message)}
+}
+async function syncAlertsToSheets(){
+ try{
+  if(!alerts.length)return alert('Não há alertas para enviar. Rode a análise primeiro.');
+  saveScriptUrl();setSheetsStatus(`Enviando ${alerts.length} alerta(s)...`);
+  for(const a of alerts){await postToSheets({tipo:'alerta',severidade:a.sev,titulo:a.title,campanha:a.campaign,descricao:a.text});}
+  setSheetsStatus(`Alertas enviados: ${alerts.length}.`);
+ }catch(e){setSheetsStatus('Erro ao enviar alertas: '+e.message);alert(e.message)}
+}
+async function syncCampaignsToSheets(){
+ try{
+  if(!campaigns.length)return alert('Não há campanhas para enviar. Rode a análise primeiro.');
+  saveScriptUrl();setSheetsStatus(`Enviando ${campaigns.length} campanha(s)...`);
+  for(const c of campaigns){const d=diagnosis(c),m=c.metrics;await postToSheets({tipo:'campanha',campanha:c.name,status:c.status,objetivo:c.objective,gasto:m.spend,impressoes:m.impressions,cliques:m.clicks,ctr:m.ctr,cpc:m.cpc,conversas:m.messages,custoConversa:m.cpmg,nota:c.score,diagnostico:d[0],acao:d[1]});}
+  setSheetsStatus(`Campanhas enviadas: ${campaigns.length}.`);
+ }catch(e){setSheetsStatus('Erro ao enviar campanhas: '+e.message);alert(e.message)}
+}
+async function syncAllToSheets(){await syncLeadsToSheets();if(alerts.length)await syncAlertsToSheets();if(campaigns.length)await syncCampaignsToSheets();setSheetsStatus('Sincronização geral concluída.')}
+init();
+</script>
+</body>
+</html>
